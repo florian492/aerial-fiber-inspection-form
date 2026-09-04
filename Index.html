@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --border: #d0d5dd;
+      --accent: #1a73e8;
+      --bg: #f7f8fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 24px;
+      color: #1f2430;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px 0;
+    }
+    p.subtitle {
+      margin: 0 0 20px 0;
+      color: #5f6470;
+      font-size: 13px;
+    }
+    .header-fields {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1 1 200px;
+    }
+    .field-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+    }
+    .field-group input {
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    #poles {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .pole-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      width: 100%;
+    }
+    .pole-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .comment-field {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: none;
+      overflow: hidden;
+      min-height: 38px;
+      box-sizing: border-box;
+    }
+    .photo-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .photo-input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+    }
+    .file-input-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    input[type="file"] {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .photo-status {
+      font-size: 11px;
+      color: #5f6470;
+      margin-top: 4px;
+    }
+    .photo-status.uploading {
+      color: var(--accent);
+    }
+    .photo-status.success {
+      color: #1e7a34;
+    }
+    .photo-status.error {
+      color: #b3261e;
+    }
+    .pole-label {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .pole-number {
+      width: 90px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .code-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1 1 78px;
+      min-width: 78px;
+    }
+    .code-group label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #667085;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .code-select {
+      padding: 6px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      width: 100%;
+    }
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #b3261e;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      margin-left: auto;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 14px;
+      font-size: 13px;
+    }
+    #status.ok { color: #1e7a34; }
+    #status.err { color: #b3261e; }
+
+    @media (max-width: 640px) {
+      .pole-row { flex-direction: column; align-items: stretch; }
+      .pole-number { width: 100%; }
+      .code-group { min-width: 100%; }
+      .remove-btn { margin-left: 0; align-self: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Aerial Fiber Attachment Inspection</h1>
+  <p class="subtitle">Contractor work verification — enter pole number and select any applicable failure codes.</p>
+
+  <div class="header-fields">
+    <div class="field-group">
+      <label for="inspectorName">Inspector Name</label>
+      <input type="text" id="inspectorName" placeholder="Full name">
+    </div>
+    <div class="field-group">
+      <label for="inspectionDate">Inspection Date</label>
+      <input type="date" id="inspectionDate">
+    </div>
+  </div>
+
+  <div id="poles"></div>
+
+  <div class="actions">
+    <button type="button" class="secondary" id="addPoleBtn">+ Add Pole</button>
+    <button type="button" class="primary" id="submitBtn">Submit</button>
+  </div>
+
+  <div id="status"></div>
+
+  <template id="rowTemplate">
+    <div class="pole-card">
+      <div class="pole-row">
+        <span class="pole-label">Pole</span>
+        <input type="text" class="pole-number" placeholder="Number">
+        <div class="code-group"><label>Fail 1</label><select class="code-select"></select></div>
+        <div class="code-group"><label>Fail 2</label><select class="code-select"></select></div>
+        <div class="code-group"><label>Fail 3</label><select class="code-select"></select></div>
+        <div class="code-group"><label>Fail 4</label><select class="code-select"></select></div>
+        <div class="code-group"><label>Fail 5</label><select class="code-select"></select></div>
+        <div class="code-group"><label>Fail 6</label><select class="code-select"></select></div>
+        <button type="button" class="remove-btn" title="Remove pole">&times;</button>
+      </div>
+      <div class="photo-input-group">
+        <label>Photo (optional)</label>
+        <div class="file-input-wrapper">
+          <input type="file" class="photo-file" accept="image/*">
+        </div>
+        <div class="photo-status"></div>
+      </div>
+      <textarea class="comment-field" rows="1" placeholder="Comments..."></textarea>
+    </div>
+  </template>
+
+  <script>
+    // Codes embedded directly so the form works instantly, without waiting on a
+    // round-trip to the Apps Script server (also means it renders correctly in
+    // any plain HTML preview, not just when deployed as a web app).
+    const FAILURE_CODES = [
+      'PC1','PC2','PC3','PC4',
+      'MC1','MC2','MC3',
+      'SL1','SL2',
+      'V1','R1',
+      'C1','C2','RC1','C3','C4','C5','C6',
+      'DM3','M4',
+      'G1','G2','G3','G4',
+      'GR','L','B1','AC1','TC1',
+      'CS1','CS2'
+    ];
+
+    function buildOptionsHtml() {
+      let html = '<option value="">--</option>';
+      FAILURE_CODES.forEach(function (code) {
+        html += '<option value="' + code + '">' + code + '</option>';
+      });
+      return html;
+    }
+
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    function addPoleRow() {
+      const template = document.getElementById('rowTemplate');
+      const clone = template.content.cloneNode(true);
+      clone.querySelectorAll('.code-select').forEach(function (sel) {
+        sel.innerHTML = buildOptionsHtml();
+      });
+      clone.querySelector('.remove-btn').addEventListener('click', function (e) {
+        e.target.closest('.pole-card').remove();
+      });
+      const textarea = clone.querySelector('.comment-field');
+      textarea.addEventListener('input', function () {
+        autoResize(textarea);
+      });
+      document.getElementById('poles').appendChild(clone);
+    }
+
+    function collectData() {
+      const cards = document.querySelectorAll('#poles .pole-card');
+      const data = [];
+      cards.forEach(function (card) {
+        const poleNumber = card.querySelector('.pole-number').value.trim();
+        const codes = Array.from(card.querySelectorAll('.code-select')).map(function (s) {
+          return s.value;
+        });
+        const comment = card.querySelector('.comment-field').value.trim();
+        const photoFile = card.querySelector('.photo-file').files[0];
+        const hasPhoto = photoFile ? true : false;
+        
+        if (poleNumber) {
+          data.push({ 
+            poleNumber: poleNumber, 
+            codes: codes, 
+            comment: comment,
+            hasPhoto: hasPhoto
+          });
+        }
+      });
+      return data;
+    }
+
+    function setStatus(msg, isError) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = isError ? 'err' : 'ok';
+    }
+
+    document.getElementById('addPoleBtn').addEventListener('click', addPoleRow);
+
+    document.getElementById('submitBtn').addEventListener('click', function () {
+      const inspectorName = document.getElementById('inspectorName').value.trim();
+      const inspectionDate = document.getElementById('inspectionDate').value;
+      const dataForSheet = collectData();
+
+      if (!inspectorName) {
+        setStatus('Enter the inspector name before submitting.', true);
+        return;
+      }
+      if (!inspectionDate) {
+        setStatus('Select the inspection date before submitting.', true);
+        return;
+      }
+      if (!dataForSheet.length) {
+        setStatus('Enter at least one pole number before submitting.', true);
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      setStatus('Submitting...', false);
+
+      // Get all pole cards to access photo files
+      const cards = document.querySelectorAll('#poles .pole-card');
+      let uploadCount = 0;
+      let uploadTotal = 0;
+
+      // Count photos to upload
+      cards.forEach(function (card) {
+        if (card.querySelector('.photo-file').files[0]) {
+          uploadTotal++;
+        }
+      });
+
+      console.log('Total photos to upload: ' + uploadTotal);
+      console.log('Data for sheet: ' + JSON.stringify(dataForSheet));
+
+      if (uploadTotal === 0) {
+        // No photos to upload, proceed directly to inspection submission
+        console.log('No photos, submitting directly');
+        submitInspectionData(inspectorName, inspectionDate, dataForSheet, btn);
+      } else {
+        // Upload each photo
+        cards.forEach(function (card, cardIndex) {
+          const photoFile = card.querySelector('.photo-file').files[0];
+          if (photoFile) {
+            const poleNumber = card.querySelector('.pole-number').value.trim();
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const fileExtension = photoFile.name.split('.').pop();
+              const newFileName = 'Pole_' + poleNumber + '.' + fileExtension;
+              console.log('Uploading photo: ' + newFileName);
+              google.script.run
+                .withSuccessHandler(function () {
+                  uploadCount++;
+                  console.log('Photo uploaded (' + uploadCount + '/' + uploadTotal + ')');
+                  if (uploadCount === uploadTotal) {
+                    console.log('All photos uploaded, submitting inspection data');
+                    submitInspectionData(inspectorName, inspectionDate, dataForSheet, btn);
+                  }
+                })
+                .withFailureHandler(function (err) {
+                  btn.disabled = false;
+                  console.error('Photo upload error: ' + err.message);
+                  setStatus('Error uploading photo for pole ' + poleNumber + ': ' + err.message, true);
+                })
+                .uploadPhoto(e.target.result, newFileName);
+            };
+            reader.readAsDataURL(photoFile);
+          }
+        });
+      }
+    });
+
+    function submitInspectionData(inspectorName, inspectionDate, data, btn) {
+      console.log('Calling submitInspection with:');
+      console.log('  inspectorName: ' + inspectorName);
+      console.log('  inspectionDate: ' + inspectionDate);
+      console.log('  data: ' + JSON.stringify(data));
+      
+      google.script.run
+        .withSuccessHandler(function (result) {
+          btn.disabled = false;
+          console.log('Submission successful: ' + result.count + ' pole(s)');
+          setStatus('Submitted ' + result.count + ' pole(s) successfully.', false);
+          document.getElementById('poles').innerHTML = '';
+          addPoleRow();
+        })
+        .withFailureHandler(function (err) {
+          btn.disabled = false;
+          console.error('Submission error: ' + err.message);
+          setStatus('Error: ' + err.message, true);
+        })
+        .submitInspection(inspectorName, inspectionDate, data);
+    }
+
+    // Init: render the first pole row immediately
+    addPoleRow();
+  </script>
+</body>
+</html>
